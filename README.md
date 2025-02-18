@@ -1,5 +1,5 @@
 # TiMEstamp: Timing Mobile ELement Insertion from Multiple Sequence Alignments
-TiMEstamp is an R package for inferring evolutionary timepoints from multiple sequence alignments.
+TiMEstamp is an R package for inferring insertion timepoints of mobile elements from multiple sequence alignments.
 
 ## INSTALLATION:
 1. Clone from GitHub:
@@ -28,13 +28,13 @@ output_folder/
 ├── aln_coverage/
 │   └── # Contains alignment coverage results at sister-clade levels
 ├── large_gap_len/
-│   └── # Contains lengths of upstream and downstream regions around orthologous loci annotations
+│   └── # Contains the unaligned lengths of the upstream and downstream flanking regions surrounding the region of interest (ROI) in orthologous loci.
 ├── buffered_large_gap_len/
-│   └── # Contains lengths of upstream and downstream regions around orthologous loci annotations, excluding regions immediately adjacent to the annotation (with a defined buffer distance upstream and downstream)
+│   └── # Contains the unaligned lengths of the upstream and downstream flanking regions surrounding the ROI±length buffer in orthologous loci, 
 ├── sister_clades.rds
 │   └── # A single R object that contains a list of sister-taxon/clades relative to the reference species
 └── rmsk_range.rds
-    └── # A a single R object that contains a prased repeatMasker annotation
+    └── # A a single R object that contains prased repeatMasker annotation
 ```
 
 ### Get Timepoints:
