@@ -23,6 +23,7 @@ chrom = NULL
 ```
 
 Output: 
+```
 output_folder/
 ├── aln_coverage/
 │   └── # Contains alignment coverage results at sister-clade levels
@@ -34,6 +35,7 @@ output_folder/
 │   └── # A single R object that contains a list of sister-taxon/clades relative to the reference species
 └── rmsk_range.rds
     └── # A a single R object that contains a prased repeatMasker annotation
+```
 
 ### Get Timepoints:
 Infer the insertion timepoint of annotation in RepeatMasker.
@@ -46,23 +48,24 @@ chrom = NULL)
 ```
 
 Output:
+```
 output_folder/
 ├── timepoint/
 │   └── # Contains inferred timepoint of each region by chromosome.
 └── timepoint.rds
     └── # A a single R object that contains all timepoint and prased repeatMasker annotation
-
+```
 
 
 ## EXPLANATION OF PARAMETERS:
 `get_alignment_coverage()` Parameters:
-`tree_file` (str): Path to the phylogenetic tree file (.nh format).
-`rmsk_file` (str): Path to RepeatMasker output file (.out format).
-`consider_missing_loci` (bool): If TRUE, infers the absence of orthologous loci in other species.
-`folder` (str): Folder for output results.
-`chrom` (str or NULL): Chromosome to analyze. If NULL, analyzes all chromosomes.
+- `tree_file` (str): Path to the phylogenetic tree file (.nh format).
+- `rmsk_file` (str): Path to RepeatMasker output file (.out format).
+- `consider_missing_loci` (bool): If TRUE, infers the absence of orthologous loci in other species.
+- `folder` (str): Folder for output results.
+- `chrom` (str or NULL): Chromosome to analyze. If NULL, analyzes all chromosomes.
 
 `get_timepoint`() Parameters:
-`folder` (str): Folder with alignment coverage results.
-`consider_missing_loci` (bool): If TRUE, includes inferred missing loci.
-`chrom` (str or NULL): Chromosome to analyze. If NULL, analyze all chromosomes.
+- `folder` (str): Folder with alignment coverage results.
+- `consider_missing_loci` (bool): If TRUE, includes inferred missing loci.
+- `chrom` (str or NULL): Chromosome to analyze. If NULL, analyze all chromosomes.
