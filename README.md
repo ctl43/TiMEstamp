@@ -10,11 +10,11 @@ R CMD INSTALL TiMEstamp
 
 ## PREPARATION OF MULTIPLE SEQUENCE ALIGNMENT (MSA):
 1. Download available MSA data in MAF format (e.g., https://hgdownload.soe.ucsc.edu/goldenPath/hg38/multiz470way/) or generate the multiple genome alignment by yourself.
-2. Split the genome alignment by species using PHAST.
-```mafSpeciesSubset -keepFirst```
-3. Remove gaps relative to the reference genome, which should always be the first genome, using PHAST. The result files will be in FASTA format.
-```msa_view --gap-strip 1```
-P.S.: This prepreation step will be incorporated into TiMEstamp without relying PHAST.
+2. Split the genome alignment by species using PHAST.  
+```mafSpeciesSubset -keepFirst```  
+3. Remove gaps relative to the reference genome, which should always be the first genome, using PHAST. The result files will be in FASTA format.  
+```msa_view --gap-strip 1```  
+P.S.: This prepreation step will be incorporated into TiMEstamp without relying PHAST.  
 
 ## EXTRACT GAPS RELATIVE TO THE REFERENCE GENOME:
 Unaligned regions, indicated by asterisks (*) or hyphens (-) in the resulting FASTA files, were extracted and annotated in BED file format.
