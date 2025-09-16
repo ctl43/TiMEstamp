@@ -10,12 +10,12 @@
 #'   - `up`: A matrix of upstream gap lengths grouped by species.
 #'   - `dn`: A matrix of downstream gap lengths grouped by species.
 #'
-#' @export
 #' @importFrom GenomicRanges findOverlaps GRanges seqnames start end resize flank
 #' @importFrom S4Vectors mcols<-
 #' @importFrom IRanges IntegerList ranges
 #' @importFrom stats setNames
 #' @importFrom BiocGenerics width
+#' @export
 compute_flanking_gap_length <- function(missings, ref) {
   # Identify overlaps between missing regions and reference TE annotations
   # This helps extract the flanking sequences outside the TE annotations
@@ -75,15 +75,12 @@ compute_flanking_gap_length <- function(missings, ref) {
 
   # Process Case 4: Extract both flanking regions
   if (length(case4) > 0) {
-    case4_out_p1 <- GRanges(paste0(x_seqnames[case4], "_", ol@to[case4]),
-                            IRanges(x_start[case4], y_start[case4] - 1L))
-    case4_out_p2 <- GRanges(paste0(x_seqnames[case4], "_", ol@to[case4]),
-                            IRanges(y_end[case4] + 1L, x_end[case4]))
+    case4_sn <- paste0(x_seqnames[case4], "_", ol@to[case4])
+    case4_out <- c(GRanges(case4_sn, IRanges(x_start[case4], y_start[case4] - 1L)),
+                      GRanges(case4_sn, IRanges(y_end[case4] + 1L, x_end[case4])))
   } else {
-    case4_out_p1 <- case4_out_p2 <- GRanges()
+    case4_out <- GRanges()
   }
-
-  case4_out <- c(case4_out_p1, case4_out_p2)
 
   # Assign labels to extracted regions
   case1_out$labels <- x_labels[case1]
@@ -92,6 +89,7 @@ compute_flanking_gap_length <- function(missings, ref) {
 
   # Combine all cases into a final flanking region output
   out <- c(case1_out, case2_out, case4_out)
+  rm(case1_out);rm(case2_out);rm(case4_out);gc()
   grp <- c(ol@to[case1], ol@to[case2], ol@to[case4], ol@to[case4])
 
   ### Compute Upstream Gaps ###
@@ -113,7 +111,7 @@ compute_flanking_gap_length <- function(missings, ref) {
     sum(IntegerList(split(y, z)))
   }, y = up_len_by_sp, z = up_grp_by_sp)
 
-  rownames(up_length) <- as.character(ref)
+  
 
   ### Compute Downstream Gaps ###
   ref_dn <- ref
@@ -133,7 +131,14 @@ compute_flanking_gap_length <- function(missings, ref) {
     sum(IntegerList(split(y, z)))
   }, y = dn_len_by_sp, z = dn_grp_by_sp)
 
-  rownames(dn_length) <- as.character(ref)
+  
+  if(is.null(names(ref))|any(duplicated(names(ref)))){
+    rownames(up_length) <- as.character(ref)
+    rownames(dn_length) <- as.character(ref)
+  }else{
+    rownames(up_length) <- rownames(dn_length) <- names(ref)
+  }
+  
 
   # Clean memory
   gc()
