@@ -10,8 +10,6 @@ TiMEstamp is an R package for inferring insertion timepoints of mobile elements 
 
 ## Table of Contents
 
-## Table of Contents
-
 - [Requirements](#requirements)
 - [Installation](#installation)
 - [Input data and folder layout](#input-data-and-folder-layout)
