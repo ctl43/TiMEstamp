@@ -1,96 +1,220 @@
-# TiMEstamp: Timing Mobile ELement Insertion from Multiple Sequence Alignments
-TiMEstamp is an R package for inferring insertion timepoints of mobile elements from multiple sequence alignments.
+# TiMEstamp: Timing Mobile Element Insertions from Multiple Sequence Alignments
 
-## INSTALLATION:
-1. Clone from GitHub:
+TiMEstamp is an R package for inferring insertion timepoints of mobile elements from whole-genome multiple sequence alignments (MSAs). It includes utilities to:
+
+- convert per-chromosome MAF blocks into per-species FASTA aligned to a reference genome
+- extract unaligned regions (“gaps”, represented by `-`) relative to the reference as BED and `GRanges` objects
+- run downstream workflows to estimate insertion timepoints and explore chimeric insertions
+
+---
+
+## Table of Contents
+
+## Table of Contents
+
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Input data and folder layout](#input-data-and-folder-layout)
+  - [Multiple sequence alignment (MAF)](#multiple-sequence-alignment-maf)
+  - [Species list](#species-list)
+  - [Chromosome sizes](#chromosome-sizes)
+- [Preparation of Multiple Sequence Alignment (MSA)](#preparation-of-multiple-sequence-alignment-msa)
+- [Step 1 — Convert MAF to per-species FASTA](#step-1--convert-maf-to-per-species-fasta)
+- [Step 2 — Extract gaps as BED and RDS](#step-2--extract-gaps-as-bed-and-rds)
+- [Usage example 1 — RepeatMasker timepoints](#usage-example-1--repeatmasker-timepoints)
+  - [EXPLANATION OF OUTPUT](#explanation-of-output)
+  - [EXAMPLE OUTPUT FORMAT](#example-output-format)
+- [Usage example 2 — Chimeric insertions on chr22](#usage-example-2--chimeric-insertions-on-chr22)
+  - [Example output file](#example-output-file)
+  - [Column definitions](#column-definitions)
+- [Notes and tips](#notes-and-tips)
+- [Citing TiMEstamp](#citing-timestamp)
+
+---
+
+## Requirements
+
+- **R** ≥ 4.2  
+- **R packages**: `Rcpp`, `BiocParallel`, `rtracklayer`, `S4Vectors`, `ape`, `IRanges`, `GenomicRanges`, `XVector`, `data.table`, `tidytree`
+  (Install from CRAN/Bioconductor as needed.)
+- **C++17 toolchain** (for `std::filesystem`)  
+  - Linux: GCC ≥ 8 (GCC 11+ recommended)  
+  - macOS: Xcode Command Line Tools
+- Adequate disk space for large MAF/FASTA/derived files
+
+> The package compiles C++ sources with **C++17**. If you see build errors mentioning `std::filesystem`, ensure your compiler is set to C++17.
+
+---
+## Installation
+Clone from GitHub:
+```bash
 git clone https://github.com/ctl43/TiMEstamp.git
-
-2. Install Using R CMD:
 R CMD INSTALL TiMEstamp
+```
+---
 
-## PREPARATION OF MULTIPLE SEQUENCE ALIGNMENT (MSA):
-1. Download available MSA data in MAF format (e.g., https://hgdownload.soe.ucsc.edu/goldenPath/hg38/multiz470way/) or generate the multiple genome alignment by yourself. The MAF files must be stored separately by chromosome in the reference species.
-2. Split the genome alignment by species using PHAST.  
-```mafSpeciesSubset -keepFirst```  
-3. Remove gaps relative to the reference genome, which should always be the first genome, using PHAST. The result files will be in FASTA format.  
-```msa_view --gap-strip 1```  
+## Input data and folder layout
 
-P.S.: These prepreation steps will be incorporated into TiMEstamp later without relying PHAST.  
+### Multiple sequence alignment (MAF)
 
-## EXTRACT GAPS RELATIVE TO THE REFERENCE GENOME:
-Unaligned regions, indicated by asterisks (*) or hyphens (-) in the resulting FASTA files, were extracted and annotated in BED file format.
-```r
-# Finding all unaligned regions (*/-) and store in RDS format, an R object.
-get_unaligned_regions(fa, maf, out_folder)
-combined_unaligned_by_chrom(fa, input_folder, output_folder, threads = 4)
+Download per-chromosome MAFs for your reference assembly (e.g., hg38 multiz):
+
+- `https://hgdownload.soe.ucsc.edu/goldenPath/hg38/multiz470way/`
+
+**Requirement:** MAF files must be stored **one per reference chromosome**.
+
+Example layout:
+
+```
+/path/to/maf_root/
+  chr1.maf
+  chr2.maf
+  …
+  chr22.maf
+  chrX.maf
+  chrY.maf
 ```
 
-## USAGE EXAMPLE:
+### Species list
 
-Below is a simple example of running **TiMEstamp** with a human genome–based multiple sequence alignment (MSA).  
-We assume the MSA and repeatMasker annotation files are already prepared as described above.  
+Plain text file with one species ID per line (prefix before the dot in MAF `s` lines):
+
+```
+hg38
+panTro6
+gorGor6
+ponAbe3
+HLhylMol2
+```
+
+### Chromosome sizes
+
+UCSC-style `chrom.sizes` for the **reference** assembly (e.g., hg38):
+- https://hgdownload.cse.ucsc.edu/goldenpath/hg38/bigZips/hg38.chrom.sizes
+```
+chr1    248956422
+chr2    242193529
+…
+chr22   50818468
+chrX    156040895
+chrY    57227415
+```
+
+---
+
+## PREPARATION OF MULTIPLE SEQUENCE ALIGNMENT (MSA):
+---
+
+## Step 1 — Convert MAF to per-species FASTA
+Splits the alignment by species, removes columns where the **reference** has `-`, and writes per-species FASTA sequences under `<out_folder>/fasta/<chrom>/`. FASTA headers are set to the **reference chromosome name** (e.g., `>chr22`). Inter-block gaps are filled with `N` for the reference and `-` for non-reference species. Sequences are padded to the reference chromosome length from `chrom.sizes`.
 
 ```r
-# Define working directory for this project
-work_dir <- "TiMEstamp_example/hg38_multiz470way"
+convert_maf_to_fasta(
+  maf_folder        = "/path/to/maf_root",
+  species_file      = "/path/to/species_list.txt",
+  chrom_size_file   = "/path/to/hg38.chrom.sizes",
+  out_folder        = "/path/to/TiMEstamp_example/hg38_multiz470way",
+  reference_species = "hg38",
+  threads           = 1L
+)
+```
 
-# Step 1. Prepare RepeatMasker annotation
+**Resulting structure:**
+
+```
+<out_folder>/
+  fasta/
+    chr1/
+      hg38.fa
+      panTro6.fa
+      gorGor6.fa
+      …
+    chr2/
+      …
+    chr22/
+      …
+```
+---
+
+## Step 2 — Extract gaps as BED and RDS
+
+Scans each per-species FASTA for contiguous `-` runs (gaps) and writes:
+
+- **BED** per chromosome → `<out_folder>/gap_bed/<chrom>.bed`  
+  (0-based, half-open; columns: `chrom`, `start`, `end`, `name`, where `name` is the FASTA basename/species tag)
+- **GRanges** per chromosome → `<out_folder>/gap/<chrom>.rds`  
+  (`labels` factor column contains species tags with consistent levels)
+
+```r
+extract_gaps_from_fasta(
+  folder  = "/path/to/TiMEstamp_example/hg38_multiz470way",
+  threads = 1L
+)
+```
+
+---
+
+## Usage example 1 — RepeatMasker timepoints
+
+This workflow estimates insertion timepoints for all RepeatMasker annotations using an MSA from `multiz470way`. It is optimized for speed and memory efficiency and is recommended when the number of annotations exceeds ~50,000, where per-locus inspection becomes impractical. The trade-off is that it does not evaluate locus-specific availability (unlike Workflow 2); however, for family- or class-level transposable element analyses it captures overall evolutionary trends with sufficient accuracy. See Supplementary Figure 2 in the original paper.
+
+```r
+# Define a working directory
+work_dir <- "/path/to/TiMEstamp_example"
+
+# 1) Prepare RepeatMasker annotation
 prepare_rmsk(
   rmsk_file = "reference/rmsk_hg38.fa.out",
   folder    = work_dir
 )
 
-# Step 2. (Optional) Update phylogenetic tree to include only selected species
+# 2) (Optional) Prune the phylogenetic tree to selected species
 update_tree(
   tree    = "phylogenetic/hg38.470way.nh",
   folder  = work_dir,
   species = selected_species
 )
 
-# Step 3. Define sister clades based on the updated tree
+# 3) Define sister clades from the updated tree
 get_sister(
   tree_file = file.path(work_dir, "updated_tree.nh"),
   folder    = work_dir
 )
 
-# Step 4. Identify missing loci coverage by clade
+# 4) Identify missing loci coverage by clade
 get_missing_coverage_by_clade_fast(folder = work_dir)
 
-# Step 5. Clean clade data and filter loci by criteria
+# 5) Clean clade data and filter loci
 clean_clade_data_fast(folder = work_dir)
 
-# Step 6. Estimate insertion timepoints of mobile elements
+# 6) Estimate insertion timepoints
 get_timepoint_fast(folder = work_dir)
 ```
+
 ---
 
-## EXPLANATION OF OUTPUT
+### EXPLANATION OF OUTPUT
 
 After running the pipeline, **TiMEstamp** will generate the following key outputs inside the working directory (`work_dir`):  
 
 - **`reference_anno/`**  
   Processed RepeatMasker annotation files for the reference genome.  
 
-- **`phylogenetic/`**  
-  - `updated_tree.nh`: Phylogenetic tree pruned to the selected species.  
-  - `sister_clades.rds`: List of sister clade pairs used for inferring insertion timing.  
-
-- **`gap/`**  
-  BED or RDS files containing unaligned regions (gaps) for each chromosome relative to the reference genome.  
-
 - **`fast/`**  
   Intermediate results including reference annotation, clade coverage summaries, and pre-filtered gap data.  
 
-- **`results/`**  
-  - `cleaned_gap_data.rds`: Processed gap annotations after filtering by size and coverage.  
-  - `timepoints.rds`: Final estimates of insertion timing for mobile elements, inferred from the presence/absence patterns across clades.  
+- **`updated_tree.nh`**: Phylogenetic tree pruned to the selected species.  
+
+- **`sister_clades.rds`**: List of sister clade pairs used for inferring insertion timing.  
+
+- **`predicted_tp.rds`**  
+  - Final estimates of insertion timing for mobile elements, inferred from the presence/absence patterns across clades.  
 
 ---
 
-## EXAMPLE OUTPUT FORMAT
+### EXAMPLE OUTPUT FORMAT
 
 The main output (`timepoints.rds`) is a **GRanges object** with annotated mobile elements and their inferred insertion timepoints.  
-A simplified excerpt looks like this:  
 
 ```
 GRanges object with 9958 ranges and 5 metadata columns:
@@ -111,39 +235,37 @@ GRanges object with 9958 ranges and 5 metadata columns:
   - For example, `L1PA4_532` and `L1PA4_821` are represented by two consecutive fragments joined into a single annotated repeat.  
 - **timepoint**: Estimated evolutionary node when the insertion occurred (stored as a factor).  
 
-This structure preserves both the **high-level repeat annotation** (main GRanges row) and the **fragment-level details** (`members`), ensuring accuracy when repeats are interrupted or fragmented. 
+This structure preserves both the **high-level repeat annotation** (main GRanges row) and the **fragment-level details** (`members`), that in case repeats are interrupted or fragmented. 
 
-## Example: Detecting chimeric insertions on chromosome 22
+## Usage example 2 — Chimeric insertions on chr22
 
 The following example illustrates how to run the *chimera prediction* workflow for LINE-1 elements on chromosome 22.  
-Input includes a filtered RepeatMasker reference file (`basic_filtered_l1.rds`) and a TiMEstamp working directory (`TiMEstamp`).  
 
 ```r
-# Define working directory for this project
-work_dir <- "TiMEstamp_example/hg38_multiz470way"
+work_dir <- "/path/to/TiMEstamp_example/hg38_multiz470way"
 
-# Step 1. Identify portions of LINE-1 that are missing from the alignment
+# 1) Identify portions of LINE-1 missing from the alignment
 get_missing_portion(
-  "chr22",
+  chrom          = "chr22",
   reference_file = "reference/basic_filtered_l1.rds",
   selected_info  = "fivep_frag",
   folder         = work_dir
 )
 
-# Step 2. Inspect loci for gap structure and missing data
+# 2) Inspect loci for gap structure and missing data
 inspect_loci(
-  folder = "TiMEstamp",
+  folder = work_dir,
   chrom  = "chr22"
 )
 
-# Step 3. Extract flanking segments (here, upstream of the TE)
+# 3) Extract flanking segments (e.g., upstream)
 extract_flanking_segment(
   folder     = work_dir,
   chrom      = "chr22",
   which_side = "upstream"
 )
 
-# Step 4. Predict potential chimeric insertions
+# 4) Predict potential chimeric insertions
 predict_chimera(
   folder = work_dir,
   chrom  = "chr22"
@@ -151,12 +273,13 @@ predict_chimera(
 ```
 
 ### Example output file
-The chimera prediction step produces tab-delimited files named like:
+The chimera step produces tab-delimited files:
 
 ```
-TiMEstamp_example/hg38_multiz470way/predicted_chimera_upstream.txt
-TiMEstamp_example/hg38_multiz470way/predicted_chimera_downstream.txt
+<work_dir>/predicted_chimera_upstream.txt
 ```
+
+---
 
 A snippet from `predicted_chimera_upstream.txt`:
 
@@ -178,3 +301,13 @@ chr22:11580142-11584309:-	2468839	chr22:11584309:-	chr22:11580142:-	chr22:115830
 - **flanking_gcoord**: Coordinates of the extracted flanking segment.  
 - **full_range**: Combined span of TE plus flanking region.  
 - **timepoint**: Inferred evolutionary timepoint (factor indicating lineage of insertion).  
+
+## Notes and tips
+Because MSAs spanning evolutionarily distant species can be noisy, predicted chimeric insertions may include false positives. We strongly recommend **manual review of every candidate** to: (i) verify 5′/3′ breakpoints in the MSA; (ii) confirm orthology and local synteny across species; (iii) rule out assembly gaps, paralogy, or alignment artifacts; (iv) cross-check against independent alignments (e.g., multi-assembly MSAs such as the 447-genome set of Kuderna et al., 2023); and (v) inspect molecular signatures of the TE (e.g., target site duplications [TSDs], and poly(A) tails for LINE-1).
+
+## Citing TiMEstamp
+
+If you use **TiMEstamp** in your research, please cite:
+
+Law CT, Burns KH. *Comparative Genomics Reveals LINE-1 Recombination with Diverse RNAs*. **bioRxiv** [Preprint]. 2025 Feb 3:2025.02.02.635956. doi: 10.1101/2025.02.02.635956. PMID: 39975348; PMCID: PMC11838501.
+
