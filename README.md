@@ -100,7 +100,7 @@ chrY    57227415
 
 ---
 
-## PREPARATION OF MULTIPLE SEQUENCE ALIGNMENT (MSA):
+## Preparation of multiple sequence alignment (MSA):
 ---
 
 ## Step 1 — Convert MAF to per-species FASTA
@@ -112,7 +112,6 @@ convert_maf_to_fasta(
   species_file      = "/path/to/species_list.txt",
   chrom_size_file   = "/path/to/hg38.chrom.sizes",
   out_folder        = "/path/to/TiMEstamp_example/hg38_multiz470way",
-  reference_species = "hg38",
   threads           = 1L
 )
 ```
@@ -191,7 +190,7 @@ get_timepoint_fast(folder = work_dir)
 
 ---
 
-### EXPLANATION OF OUTPUT
+### Explanation of output
 
 After running the pipeline, **TiMEstamp** will generate the following key outputs inside the working directory (`work_dir`):  
 
@@ -210,7 +209,7 @@ After running the pipeline, **TiMEstamp** will generate the following key output
 
 ---
 
-### EXAMPLE OUTPUT FORMAT
+### Example output format
 
 The main output (`timepoints.rds`) is a **GRanges object** with annotated mobile elements and their inferred insertion timepoints.  
 
