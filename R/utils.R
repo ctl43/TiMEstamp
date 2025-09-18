@@ -3,7 +3,6 @@
 #' @param x A list of elements.
 #' @param invert If TRUE, returns all but the first element.
 #' @return A list with the first element extracted (or removed if invert = TRUE).
-#' @export
 first_element <- function(x, invert = FALSE){
   if(length(x) == 0){
     return(x)
@@ -23,7 +22,6 @@ first_element <- function(x, invert = FALSE){
 #' @param x A list of elements.
 #' @param invert If TRUE, returns all but the last element.
 #' @return A list with the last element extracted (or removed if invert = TRUE).
-#' @export
 last_element <- function(x, invert = FALSE){
   if(length(x) == 0){
     return(x)
@@ -45,7 +43,6 @@ last_element <- function(x, invert = FALSE){
 #' @param x A GRanges object.
 #' @return A GRanges object with unused sequence levels removed.
 #' @importFrom GenomeInfoDb seqlevelsInUse
-#' @export
 clean_seqlevels <- function(x){
   seqlevels(x) <- seqlevelsInUse(x)
   return(x)
@@ -57,7 +54,6 @@ clean_seqlevels <- function(x){
 #' @param by_col If TRUE, converts by columns; otherwise, converts by rows.
 #' @return A list representation of the matrix.
 #' @importFrom IRanges NumericList CharacterList IntegerList LogicalList
-#' @export
 mat2list <- function(x, by_col = FALSE){
   what <- class(x[1])
   if(by_col){
@@ -85,7 +81,6 @@ mat2list <- function(x, by_col = FALSE){
 #' @description Removes metadata columns from a GRanges object.
 #' @param x A GRanges object.
 #' @return A GRanges object with metadata removed.
-#' @export
 empty_metadata <- function(x){
   mcols(x) <- NULL
   return(x)
@@ -97,7 +92,6 @@ empty_metadata <- function(x){
 #' @param n An integer or numeric vector indicating the total number of elements in each list component.
 #' @return A LogicalList where TRUE represents values to keep and FALSE represents values to discard.
 #' @importFrom IRanges LogicalList
-#' @export
 keep_b4_the_idx <- function(idx_list, n){
   # Purpose:
   # Given a list of indices, this function generates a logical mask where:
@@ -128,7 +122,6 @@ keep_b4_the_idx <- function(idx_list, n){
 #' @param to_be_ignored A LogicalList indicating positions that should be ignored when determining the first FALSE.
 #' @return A LogicalList where elements after the first detected FALSE remain FALSE.
 #' @importFrom IRanges IntegerList LogicalList
-#' @export
 assign_falses_after_the_first <- function(pass_list, to_be_ignored){
   # Purpose:
   # This function ensures that once a FALSE is encountered in a vector, all subsequent elements are also set to FALSE.
@@ -190,5 +183,81 @@ assign_falses_after_the_first <- function(pass_list, to_be_ignored){
   corrected_false <- LogicalList(split(corrected_false, grp))
 
   return(corrected_false)
+}
+
+
+#' @export
+#' @importFrom S4Vectors split
+#' @importFrom BiocGenerics unstrand
+merge_granges <- function(x, tol, ignore_strand = TRUE){
+  .get_list_grp <- function(x, as_factor = TRUE){
+    tot <- seq_along(x)
+    if(as_factor){
+      tot <- factor(tot)
+    }
+    return(rep(tot, lengths(x)))
+  }
+  
+  
+  is_grlist <- class(x)=="CompressedGRangesList"
+  if(is_grlist){
+    grp <- .get_list_grp(x, as_factor = TRUE)
+    gr <- unlist(x)
+  }else{
+    gr <- x
+    grp <- rep(1, length(gr), as_factor = TRUE)
+  }
+  chrom <- as.integer(seqnames(gr))
+  start <- as.integer(start(gr))
+  end <- as.integer(end(gr))
+  
+  if(ignore_strand){
+    strand <- rep(1, length(gr), as_factor = TRUE)
+    gr <- unstrand(gr)
+  }else{
+    strand <- as.integer(factor(strand(gr), levels = c("+", "-", "*")))
+  }
+  
+  o <- order(grp, strand, chrom, start, end) # MUST BE SORTED LIKE THIS
+  idx <- rep(0, length(gr))
+  idx[o] <- cxx_merge_ranges(chrom[o], start[o], end[o], grp = grp[o], strand = strand[o], tol = tol)
+  y <- IntegerList(split(idx, grp))
+  members <- split(gr, unlist(idx))
+  megred <- unlist(range(members))
+  out_grp <- y - unname(cumsum(c(0, head(lengths(unique(y)), -1)))) # converting the idx
+  out_grp <- IntegerList(out_grp)
+  
+  if(is_grlist){
+    merged_grp <- unique(y)
+    out_merged <- split(megred, .get_list_grp(merged_grp, as_factor = TRUE))
+    names(out_grp) <- names(out_merged) <- names(x)
+    return(list(idx = out_grp, regions = out_merged))
+  }else{
+    return(list(idx = unlist(out_grp, use.names = FALSE), regions = megred))
+  }
+}
+
+#'@export
+#' @importFrom BiocGenerics paste
+convert_to_character <- function(df){
+  df <- DataFrame(df)
+  converted <- lapply(df, function(x){
+    # obj_class <- class(x)
+    if(methods::is(x, "GRangesList")){
+      grp <- PartitioningByEnd(x)
+      x <- relist(as.character(unlist(x, use.names = FALSE)), grp)
+      return(paste(x, collapse = ","))
+    }
+    
+    if(grepl(class(x), "List")){
+      return(paste(x, collapse = ","))
+    }
+    
+    if(methods::is(x, "list")){
+      return(paste(CharacterList(x), collapse = ","))
+    }
+    return(as.character(x))
+  })
+  DataFrame(do.call(cbind, converted))
 }
 
