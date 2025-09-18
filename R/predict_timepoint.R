@@ -5,12 +5,11 @@
 #' @return A numeric vector indicating the predicted timepoints for each row.
 #' @importFrom IRanges IntegerList NumericList
 #' @importFrom BiocGenerics which
-#' @export
-#'
 #' @details
 #' Groups 1 to 5 contain only a limited number of species, making them more prone to random missing data.
 #' If more than two values are missing within groups 2 to 5, all subsequent groups are considered missing
 #' after the first observed missing value.
+#' @export
 predict_timepoint <- function(selected_mat, cutoff = 0.5){
   rownames(selected_mat) <- seq_len(nrow(selected_mat))
   original <- selected_mat

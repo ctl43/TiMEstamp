@@ -21,8 +21,6 @@ get_alignment_coverage <- function(tree_file, rmsk_file, folder, consider_missin
       rmsk_range <- import_rmsk(rmsk_file)
     }
   }
-
-
   sister_clades <- get_sister(tree_file)
   get_coverage_by_clades(rmsk_range = rmsk_range, sister_clades = sister_clades, folder = folder, chrom = chrom)
   if(consider_missing_loci){
