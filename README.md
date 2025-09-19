@@ -48,7 +48,7 @@ R CMD INSTALL TiMEstamp
 
 Download per-chromosome MAFs for your reference assembly (e.g., hg38 multiz):
 
-- `https://hgdownload.soe.ucsc.edu/goldenPath/hg38/multiz470way/`
+- https://hgdownload.soe.ucsc.edu/goldenPath/hg38/multiz470way/
 
 **Requirement:** MAF files must be stored **one per reference chromosome**.
 
@@ -88,6 +88,14 @@ chr22   50818468
 chrX    156040895
 chrY    57227415
 ```
+
+### Phylogenetic tree
+Provide a Phylogenetic tree in Newick file (`.nh` or `.nwk` accepted).
+Tip labels must **exactly match** your species IDs (e.g., `hg38`, `panTro6`), be **unique**, and include the **reference species**.
+Branch lengths are optional. (e.g., https://hgdownload.soe.ucsc.edu/goldenPath/hg38/multiz470way/hg38.470way.nh)
+
+### Annotation file
+For example, repeatMasker annotation (https://www.repeatmasker.org/genomes/hg38/rmsk4.0.5_rb20140131/hg38.fa.out.gz)
 
 ---
 
