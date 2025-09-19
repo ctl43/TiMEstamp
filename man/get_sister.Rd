@@ -7,14 +7,14 @@
 get_sister(tree, folder = NULL)
 }
 \arguments{
-\item{tree}{A `phylo` object representing the phylogenetic tree, or a character string 
+\item{tree}{A \code{phylo} object representing the phylogenetic tree, or a character string
 specifying the file path to a Newick-format tree.}
 
 \item{folder}{An optional character string specifying a directory to save the sister clades as an RDS file. Default is NULL.}
 }
 \value{
-A `CharacterList` object where each element represents the sister clades for a given node.
-  If `folder` is provided, the output is also saved as `"sister_clades.rds"` in the specified folder.
+A \code{CharacterList} object where each element represents the sister clades for a given node.
+If \code{folder} is provided, the output is also saved as \code{"sister_clades.rds"} in the specified folder.
 }
 \description{
 This function extracts sister clades from a given phylogenetic tree.

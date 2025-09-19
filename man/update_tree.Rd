@@ -7,12 +7,12 @@
 update_tree(tree, species, folder)
 }
 \arguments{
-\item{tree}{A `treedata` object representing the phylogenetic tree.}
+\item{tree}{A \code{treedata} object representing the phylogenetic tree.}
 
 \item{species}{A vector of species to be kept,}
 }
 \value{
-A `treedata` object with updated metadata for sister clade groups.
+A \code{treedata} object with updated metadata for sister clade groups.
 }
 \description{
 Update Phylogenetic Tree

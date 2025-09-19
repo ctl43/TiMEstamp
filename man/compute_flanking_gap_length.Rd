@@ -7,16 +7,18 @@
 compute_flanking_gap_length(missings, ref)
 }
 \arguments{
-\item{missings}{A `GRanges` object representing missing regions in the genome.}
+\item{missings}{A \code{GRanges} object representing missing regions in the genome.}
 
-\item{ref}{A `GRanges` object representing the reference TE annotations.}
+\item{ref}{A \code{GRanges} object representing the reference TE annotations.}
 }
 \value{
 A list containing:
-  - `up`: A matrix of upstream gap lengths grouped by species.
-  - `dn`: A matrix of downstream gap lengths grouped by species.
+\itemize{
+\item \code{up}: A matrix of upstream gap lengths grouped by species.
+\item \code{dn}: A matrix of downstream gap lengths grouped by species.
+}
 }
 \description{
 This function calculates the upstream and downstream gap lengths of locs that do not have the TE insertion
-identifies flanking regions based on overlaps and extracts gaps using a logic similar to `setdiff` in `GenomicRanges`.
+identifies flanking regions based on overlaps and extracts gaps using a logic similar to \code{setdiff} in \code{GenomicRanges}.
 }
