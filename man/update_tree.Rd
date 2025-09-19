@@ -2,18 +2,18 @@
 % Please edit documentation in R/update_tree.R
 \name{update_tree}
 \alias{update_tree}
-\title{Update Phylogenetic Tree with New Sister Clades}
+\title{Update Phylogenetic Tree}
 \usage{
-update_tree(tree, new_sister_clades)
+update_tree(tree, species, folder)
 }
 \arguments{
 \item{tree}{A `treedata` object representing the phylogenetic tree.}
 
-\item{new_sister_clades}{A list where each element represents a sister clade,}
+\item{species}{A vector of species to be kept,}
 }
 \value{
 A `treedata` object with updated metadata for sister clade groups.
 }
 \description{
-Update Phylogenetic Tree with New Sister Clades
+Update Phylogenetic Tree
 }
