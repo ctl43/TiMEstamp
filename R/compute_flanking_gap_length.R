@@ -76,8 +76,8 @@ compute_flanking_gap_length <- function(missings, ref) {
   # Process Case 4: Extract both flanking regions
   if (length(case4) > 0) {
     case4_sn <- paste0(x_seqnames[case4], "_", ol@to[case4])
-    case4_out <- c(GRanges(case4_sn, IRanges(x_start[case4], y_start[case4] - 1L)),
-                      GRanges(case4_sn, IRanges(y_end[case4] + 1L, x_end[case4])))
+    suppressWarnings(case4_out <- c(GRanges(case4_sn, IRanges(x_start[case4], y_start[case4] - 1L)),
+                                    GRanges(case4_sn, IRanges(y_end[case4] + 1L, x_end[case4]))))
   } else {
     case4_out <- GRanges()
   }
@@ -88,7 +88,7 @@ compute_flanking_gap_length <- function(missings, ref) {
   case4_out$labels <- c(x_labels[case4], x_labels[case4])
 
   # Combine all cases into a final flanking region output
-  out <- c(case1_out, case2_out, case4_out)
+  suppressWarnings(out <- c(case1_out, case2_out, case4_out))
   rm(case1_out);rm(case2_out);rm(case4_out);gc()
   grp <- c(ol@to[case1], ol@to[case2], ol@to[case4], ol@to[case4])
 

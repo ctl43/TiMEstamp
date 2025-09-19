@@ -28,7 +28,8 @@ get_timepoint_fast <- function(folder, chrom = NULL){
       stop("Not cleaned clade data is found in the folder, please run clean_clade_data_fast on all chromosomes of interest first.")
     }
   }else{
-    target_folder <- file.path(folder, "fast", "missings_by_clade")
+    warning("No cleaned clade data is found. Raw missing_by_clade was used.")
+    target_folder <- file.path(folder, "fast", "missing_by_clade")
   }
   reference_files <- file.path(reference_folder, paste0(chrom, ".rds"))
   target_files <- file.path(target_folder, paste0(chrom, ".rds"))

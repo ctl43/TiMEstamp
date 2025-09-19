@@ -55,7 +55,7 @@ get_missing_coverage_by_clade_fast <- function(folder, reference_file = NULL, ch
   if(!file.exists(clade_file)){
     stop("No clade information found. Please run get_sister() with your phylogenetic tree in Newick (NH) format first.")
   }
-  sister_clades <- readRDS()
+  sister_clades <- readRDS(clade_file)
   
   if(is.null(reference_file)){
     reference_file <- file.path(folder, "rmsk_range.rds")

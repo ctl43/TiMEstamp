@@ -92,7 +92,7 @@ clean_clade_data_by_loci_availability_by_chrom <- function(CHROM, folder, min_ga
   
   # Computing the flanking gap of the L1
   flanking_gap_len <- list()
-  system.time(flanking_gap_len[[1L]] <- compute_flanking_gap_length(missings, ref = reference_anno))
+  flanking_gap_len[[1L]] <- compute_flanking_gap_length(missings, ref = reference_anno)
   
   if(length(buffered_size) != 0){
     for (i in seq_along(buffered_size)){
@@ -104,7 +104,7 @@ clean_clade_data_by_loci_availability_by_chrom <- function(CHROM, folder, min_ga
   is_abs_target_loci_final <- Reduce("|", lapply(flanking_gap_len, function(x)(x$up > min_gap_len_for_abs)|(x$dn > min_gap_len_for_abs)))
   
   # Clean up the data
-  missing_by_clade <- readRDS(file.path(folder, "fast", "missings_by_clade", paste0(CHROM, ".rds")))
+  missing_by_clade <- readRDS(file.path(folder, "fast", "missing_by_clade", paste0(CHROM, ".rds")))
   
   # Assign NA if the available data per clade is less than 10% of the total assemblies
   if(min_available_data != 0){

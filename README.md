@@ -14,8 +14,6 @@ TiMEstamp is an R package for inferring insertion timepoints of mobile elements 
 - [Installation](#installation)
 - [Input data and folder layout](#input-data-and-folder-layout)
 - [Preparation of Multiple Sequence Alignment (MSA)](#preparation-of-multiple-sequence-alignment-msa)
-- [Step 1 — Convert MAF to per-species FASTA](#step-1--convert-maf-to-per-species-fasta)
-- [Step 2 — Extract gaps as BED and RDS](#step-2--extract-gaps-as-bed-and-rds)
 - [Usage example 1 — RepeatMasker timepoints](#usage-example-1--repeatmasker-timepoints)
 - [Usage example 2 — Chimeric insertions on chr22](#usage-example-2--chimeric-insertions-on-chr22)
 - [Notes and tips](#notes-and-tips)
@@ -94,9 +92,8 @@ chrY    57227415
 ---
 
 ## Preparation of multiple sequence alignment (MSA):
----
 
-## Step 1 — Convert MAF to per-species FASTA
+### Convert MAF to per-species FASTA
 Splits the alignment by species, removes columns where the **reference** has `-`, and writes per-species FASTA sequences under `<out_folder>/fasta/<chrom>/`. FASTA headers are set to the **reference chromosome name** (e.g., `>chr22`). Inter-block gaps are filled with `N` for the reference and `-` for non-reference species. Sequences are padded to the reference chromosome length from `chrom.sizes`.
 
 ```r
@@ -126,7 +123,7 @@ convert_maf_to_fasta(
 ```
 ---
 
-## Step 2 — Extract gaps as BED and RDS
+### Extract gaps as BED and RDS
 
 Scans each per-species FASTA for contiguous `-` runs (gaps) and writes:
 
@@ -232,9 +229,16 @@ This structure preserves both the **high-level repeat annotation** (main GRanges
 The following example illustrates how to run the *chimera prediction* workflow for LINE-1 elements on chromosome 22.  
 
 ```r
-work_dir <- "/path/to/TiMEstamp_example/hg38_multiz470way"
+# Define a working directory
+work_dir <- "/path/to/TiMEstamp_example"
 
-# 1) Identify portions of LINE-1 missing from the alignment
+# 1) Define sister clades from the updated tree
+get_sister(
+  tree_file = file.path(work_dir, "updated_tree.nh"),
+  folder    = work_dir
+)
+
+# 2) Identify portions of LINE-1 missing from the alignment
 get_missing_portion(
   chrom          = "chr22",
   reference_file = "reference/basic_filtered_l1.rds",
@@ -242,20 +246,20 @@ get_missing_portion(
   folder         = work_dir
 )
 
-# 2) Inspect loci for gap structure and missing data
+# 3) Inspect loci for gap structure and missing data
 inspect_loci(
   folder = work_dir,
   chrom  = "chr22"
 )
 
-# 3) Extract flanking segments (e.g., upstream)
+# 4) Extract flanking segments (e.g., upstream)
 extract_flanking_segment(
   folder     = work_dir,
   chrom      = "chr22",
   which_side = "upstream"
 )
 
-# 4) Predict potential chimeric insertions
+# 5) Predict potential chimeric insertions
 predict_chimera(
   folder = work_dir,
   chrom  = "chr22"
