@@ -152,6 +152,7 @@ extract_gaps_from_fasta(
 ## Usage example 1 — RepeatMasker timepoints
 
 This workflow estimates insertion timepoints for all RepeatMasker annotations using an MSA from `multiz470way`. It is optimized for speed and memory efficiency and is recommended when the number of annotations exceeds ~50,000, where per-locus inspection becomes impractical. The trade-off is that it does not evaluate locus-specific availability (unlike Workflow 2); however, for family- or class-level transposable element analyses it captures overall evolutionary trends with sufficient accuracy. See Supplementary Figure 2 in the original paper.
+
 Note: Currently, the logic implemented in `get_timepoint_fast` is tailored for the multiz470way dataset. Future updates will improve its flexibility to support additional multiple sequence alignment datasets.
 
 ```r
