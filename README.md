@@ -152,6 +152,7 @@ extract_gaps_from_fasta(
 ## Usage example 1 — RepeatMasker timepoints
 
 This workflow estimates insertion timepoints for all RepeatMasker annotations using an MSA from `multiz470way`. It is optimized for speed and memory efficiency and is recommended when the number of annotations exceeds ~50,000, where per-locus inspection becomes impractical. The trade-off is that it does not evaluate locus-specific availability (unlike Workflow 2); however, for family- or class-level transposable element analyses it captures overall evolutionary trends with sufficient accuracy. See Supplementary Figure 2 in the original paper.
+Note: Currently, the logic implemented in `get_timepoint_fast` is tailored for the multiz470way dataset. Future updates will improve its flexibility to support additional multiple sequence alignment datasets.
 
 ```r
 # Define a working directory
@@ -235,6 +236,7 @@ This structure preserves both the **high-level repeat annotation** (main GRanges
 ## Usage example 2 — Chimeric insertions on chr22
 
 The following example illustrates how to run the *chimera prediction* workflow for LINE-1 elements on chromosome 22.  
+Note: Currently, the logic implemented in `predict_chimera` is tailored for the multiz470way dataset. Future updates will improve its flexibility to support additional multiple sequence alignment datasets.
 
 ```r
 # Define a working directory
@@ -249,7 +251,7 @@ get_sister(
 # 2) Identify portions of LINE-1 missing from the alignment
 get_missing_portion(
   chrom          = "chr22",
-  reference_file = "reference/basic_filtered_l1.rds",
+  reference_file = "dataset/basic_filtered_l1.rds", # Can be found in the datset folder here.
   selected_info  = "fivep_frag",
   folder         = work_dir
 )
