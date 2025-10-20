@@ -27,10 +27,9 @@ TiMEstamp is an R package for inferring insertion timepoints of mobile elements 
 - **R packages**: `Rcpp`, `BiocParallel`, `rtracklayer`, `S4Vectors`, `ape`, `IRanges`, `GenomicRanges`, `XVector`, `data.table`, `tidytree`
   (Install from CRAN/Bioconductor as needed.)
 - **C++17 toolchain** (for `std::filesystem`)  
-  - Linux: GCC ≥ 8 (GCC 11+ recommended)  
+- This pipeline is designed and tested primarily on **Linux-based systems**
 - Adequate disk space for large MAF/FASTA/derived files
 
-> This pipeline is designed and tested primarily on **Linux-based systems**.
 > The package compiles C++ sources with **C++17**. If you see build errors mentioning `std::filesystem`, ensure your compiler is set to C++17.
 
 ---
