@@ -175,7 +175,7 @@ update_tree(
 
 # 3) Define sister clades from the updated tree
 get_sister(
-  tree_file = dataset/464_species.nh,
+  tree_file = "dataset/464_species.nh",
   folder    = work_dir
 )
 
@@ -246,7 +246,7 @@ work_dir <- "/path/to/TiMEstamp_example"
 
 # 1) Define sister clades from the updated tree
 get_sister(
-  tree_file = dataset/464_species.nh,
+  tree_file = "dataset/464_species.nh",
   folder    = work_dir
 )
 
