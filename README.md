@@ -28,9 +28,9 @@ TiMEstamp is an R package for inferring insertion timepoints of mobile elements 
   (Install from CRAN/Bioconductor as needed.)
 - **C++17 toolchain** (for `std::filesystem`)  
   - Linux: GCC ≥ 8 (GCC 11+ recommended)  
-  - macOS: Xcode Command Line Tools
 - Adequate disk space for large MAF/FASTA/derived files
 
+> This pipeline is designed and tested primarily on **Linux-based systems**.
 > The package compiles C++ sources with **C++17**. If you see build errors mentioning `std::filesystem`, ensure your compiler is set to C++17.
 
 ---
@@ -247,7 +247,7 @@ work_dir <- "/path/to/TiMEstamp_example"
 
 # 1) Define sister clades from the updated tree
 get_sister(
-  tree_file = file.path(work_dir, "updated_tree.nh"),
+  tree_file = dataset/464_species.nh,
   folder    = work_dir
 )
 
