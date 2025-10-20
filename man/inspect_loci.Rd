@@ -42,12 +42,12 @@ buffer sizes (in base pairs) to use when computing buffered flanking gap lengths
 }
 \value{
 Invisibly returns \code{NULL}. As a side effect, calls
-\code{\link[=inspect_loci_by_chrom]{inspect_loci_by_chrom()}} for each chromosome, which saves
+\code{inspect_loci_by_chrom} for each chromosome, which saves
 multiple RDS files to the \code{processed/} subdirectory of \code{folder}.
 }
 \description{
 This function is a wrapper that iterates over chromosomes in a project
-folder and calls \code{\link[=inspect_loci_by_chrom]{inspect_loci_by_chrom()}} for each one. It checks for
+folder and calls \code{inspect_loci_by_chrom} for each one. It checks for
 the presence of sister-clade information, discovers chromosomes to process
 if none are explicitly provided, and passes parameters downstream.
 }

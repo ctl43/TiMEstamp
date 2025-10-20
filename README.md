@@ -64,18 +64,6 @@ Example layout:
   chrY.maf
 ```
 
-### Species list
-
-Plain text file with one species ID per line (prefix before the dot in MAF `s` lines):
-
-```
-hg38
-panTro6
-gorGor6
-ponAbe3
-HLhylMol2
-```
-
 ### Chromosome sizes
 
 UCSC-style `chrom.sizes` for the **reference** assembly (e.g., hg38):
@@ -92,11 +80,25 @@ chrY    57227415
 ### Phylogenetic tree
 Provide a Phylogenetic tree in Newick file (`.nh` or `.nwk` accepted).
 Tip labels must **exactly match** your species IDs (e.g., `hg38`, `panTro6`), be **unique**, and include the **reference species**.
-Branch lengths are optional. (e.g., https://hgdownload.soe.ucsc.edu/goldenPath/hg38/multiz470way/hg38.470way.nh)
+Branch lengths are optional. (e.g., Find in the dataset folder or download from https://hgdownload.soe.ucsc.edu/goldenPath/hg38/multiz470way/hg38.470way.nh)
+The tree in the dataset folder retains all primate sister clades while excluding those with an insufficient number of species.
 
 ### Annotation file
 For example, repeatMasker annotation (https://www.repeatmasker.org/genomes/hg38/rmsk4.0.5_rb20140131/hg38.fa.out.gz)
+Each file (unzipped) must contain the canonical 15-column tabular structure:
 
+```
+   SW  perc perc perc  query      position in query           matching       repeat              position in  repeat
+score  div. del. ins.  sequence    begin     end    (left)    repeat         class/family         begin  end (left)   ID
+
+  463   1.3  0.6  1.7  chr1        10001   10468 (248945954) +  (TAACCC)n      Simple_repeat            1   463    (0)      1
+ 4005  11.3 21.5  1.3  chr1        10469   11447 (248944975) C  TAR1           Satellite/telo       (399) 1712    483      2
+  535  21.2 15.9  3.1  chr1        11485   11676 (248944746) C  L1MC5a         LINE/L1              (510) 5667   5447      3
+  263  29.4  1.9  1.0  chr1        11678   11780 (248944642) C  MER5B          DNA/hAT-Charlie       (74)  104      1      4
+  309  23.0  3.7  0.0  chr1        15265   15355 (248941067) C  MIR3           SINE/MIR             (119)  143     49      5
+   18  23.2  0.0  2.0  chr1        15798   15849 (248940573) +  (TGCTCC)n      Simple_repeat            1    51    (0)      6
+  255  28.9 20.5  0.0  chr1        16363   16459 (248939963) C  Charlie15a     DNA/hAT-Charlie      (101)  123      2      7
+```
 ---
 
 ## Preparation of multiple sequence alignment (MSA):
@@ -107,7 +109,7 @@ Splits the alignment by species, removes columns where the **reference** has `-`
 ```r
 convert_maf_to_fasta(
   maf_folder        = "/path/to/maf_root",
-  species_file      = "/path/to/species_list.txt",
+  tree_file         = "/path/to/tree_file", # (e.g. dataset/464_species.nh)
   chrom_size_file   = "/path/to/hg38.chrom.sizes",
   out_folder        = "/path/to/TiMEstamp_example/hg38_multiz470way",
   threads           = 1L
@@ -153,7 +155,7 @@ extract_gaps_from_fasta(
 
 This workflow estimates insertion timepoints for all RepeatMasker annotations using an MSA from `multiz470way`. It is optimized for speed and memory efficiency and is recommended when the number of annotations exceeds ~50,000, where per-locus inspection becomes impractical. The trade-off is that it does not evaluate locus-specific availability (unlike Workflow 2); however, for family- or class-level transposable element analyses it captures overall evolutionary trends with sufficient accuracy. See Supplementary Figure 2 in the original paper.
 
-Note: Currently, the logic implemented in `get_timepoint_fast` is tailored for the multiz470way dataset. Future updates will improve its flexibility to support additional multiple sequence alignment datasets.
+Note: Currently, the logic implemented in `get_timepoint_fast` is tailored for the multiz470way dataset together with `dataset/464_species.nh`. Future updates will improve its flexibility to support additional multiple sequence alignment datasets.
 
 ```r
 # Define a working directory
@@ -161,7 +163,7 @@ work_dir <- "/path/to/TiMEstamp_example"
 
 # 1) Prepare RepeatMasker annotation
 prepare_rmsk(
-  rmsk_file = "reference/rmsk_hg38.fa.out",
+  rmsk_file = "reference/hg38.fa.out",
   folder    = work_dir
 )
 
@@ -174,7 +176,7 @@ update_tree(
 
 # 3) Define sister clades from the updated tree
 get_sister(
-  tree_file = file.path(work_dir, "updated_tree.nh"),
+  tree_file = dataset/464_species.nh,
   folder    = work_dir
 )
 
