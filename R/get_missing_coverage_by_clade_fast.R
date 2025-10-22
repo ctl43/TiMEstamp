@@ -95,7 +95,7 @@ get_missing_coverage_by_clade_fast <- function(folder, chrom_size_file, referenc
 #'
 #' @keywords internal
 #' @noRd
-#' @importFrom GenomeInfoDb seqlevelsInUse seqinfo "seqinfo<-" " seqlengths" "seqlengths<-" "seqnames" "seqnames<-"
+#' @importFrom GenomeInfoDb seqlevelsInUse seqinfo "seqinfo<-" seqlengths "seqlengths<-" seqnames "seqnames<-"
 #' @importFrom GenomicRanges coverage GRanges ranges
 #' @importFrom IRanges Views viewSums PartitioningByEnd IRanges width
 get_missing_coverage_by_chrom <- function(reference_anno, chrom_size_file, sister_clades, chrom, folder){

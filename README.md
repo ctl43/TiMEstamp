@@ -184,8 +184,9 @@ get_sister(
 )
 
 # 4) Identify missing loci coverage by clade
-get_missing_coverage_by_clade_fast(folder          = work_dir, 
-				   chrom_size_file = "/path/to/hg38.chrom.sizes"
+get_missing_coverage_by_clade_fast(
+  folder          = work_dir, 
+  chrom_size_file = "/path/to/hg38.chrom.sizes"
 )
 
 # 5) Clean clade data and filter loci
