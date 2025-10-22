@@ -31,7 +31,7 @@ to recompute buffered flanking-gap lengths (default \code{c(100, 250)}).}
 species per clade required to keep a clade-level value; entries with fewer
 contributing species are set to \code{NA} (default \code{0.1}).}
 
-\item{min_clade_size}{Integer. Clades with size \code{\le} this threshold are
+\item{min_clade_size}{Integer. Clades with size below this threshold are
 exempt from \code{min_available_data} masking (default \code{20}).}
 
 \item{chrom}{Character vector or \code{NULL}. Chromosomes to process. If

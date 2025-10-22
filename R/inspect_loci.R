@@ -1,7 +1,7 @@
 #' Inspect missing loci across multiple chromosomes
 #'
 #' This function is a wrapper that iterates over chromosomes in a project
-#' folder and calls [inspect_loci_by_chrom()] for each one. It checks for
+#' folder and calls `inspect_loci_by_chrom` for each one. It checks for
 #' the presence of sister-clade information, discovers chromosomes to process
 #' if none are explicitly provided, and passes parameters downstream.
 #'
@@ -25,7 +25,7 @@
 #'   buffer sizes (in base pairs) to use when computing buffered flanking gap lengths.
 #'
 #' @return Invisibly returns \code{NULL}. As a side effect, calls
-#'   [inspect_loci_by_chrom()] for each chromosome, which saves
+#'   `inspect_loci_by_chrom` for each chromosome, which saves
 #'   multiple RDS files to the \code{processed/} subdirectory of \code{folder}.
 #'
 #' @details

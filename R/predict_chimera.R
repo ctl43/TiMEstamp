@@ -15,7 +15,7 @@
 #'   as a candidate segment. Default \code{25}.
 #' @param max_len Integer (bp). Maximum representative flank length to consider.
 #'   Default \code{1000}. (Current implementation stops if \code{max_len} is below
-#'   \code{1000} and if \code{max_len \le min_len}.)
+#'   \code{1000}.)
 #' @param min_cov Numeric in \code{[0,1]}. Minimum clade-level coverage agreement
 #'   (converted internally to a missingness cutoff as \code{1 - min_cov}) used by
 #'   \code{predict_timepoint()}. Default \code{0.65}.

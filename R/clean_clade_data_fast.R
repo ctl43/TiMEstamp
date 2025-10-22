@@ -16,7 +16,7 @@
 #' @param min_available_data Numeric in \code{[0,1]}. Minimum fraction of
 #'   species per clade required to keep a clade-level value; entries with fewer
 #'   contributing species are set to \code{NA} (default \code{0.1}).
-#' @param min_clade_size Integer. Clades with size \code{\le} this threshold are
+#' @param min_clade_size Integer. Clades with size below this threshold are
 #'   exempt from \code{min_available_data} masking (default \code{20}).
 #' @param chrom Character vector or \code{NULL}. Chromosomes to process. If
 #'   \code{NULL}, discovered from \file{folder/gap/*.rds}.

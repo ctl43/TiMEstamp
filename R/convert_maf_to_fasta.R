@@ -1,10 +1,16 @@
 #' Convert all MAFs under a folder to FASTA, organized by chromosome
 #'
-#' @param maf_folder Character. Root folder containing MAF files (recursively).
-#' @param tree_file Character. Path to a Newick tree file used to curate species list.
+#' @param maf_folder Character. Root folder that contains MAF files (searched recursively).
+#' @param species_file Character or `NULL`. Path to a plain-text file listing
+#'   species to retain (one per line). If `NULL`, species are inferred from
+#'   `tree_file` and the list is written to `out_folder/species_list.txt`.
+#' @param tree_file Character. Path to a Newick tree file used to curate the
+#'   species list when `species_file` is `NULL`. Ignored when `species_file`
+#'   is provided.
 #' @param chrom_size_file Character. UCSC-style chrom.sizes for the reference assembly.
 #' @param out_folder Character. Root output folder. Subfolders named by chromosome will be created.
-#' @param pattern Character. Regex to match MAF files. Default "^[^.].*\\.maf$" (plain .maf).
+#' @param pattern Character. Regular expression used to find MAF files.
+#'   Default is `^[^.].*\\.maf$`, which matches plain `.maf` files and skips hidden files.
 #' @param buffer_limit_mb Numeric. Memory buffer before flushing to disk.
 #' @return Invisibly, the vector of processed MAF paths.
 #' 
@@ -12,6 +18,7 @@
 #' @importFrom ape read.tree
 #' @export
 convert_maf_to_fasta <- function(maf_folder,
+                                 species_file = NULL, 
                                  tree_file,
                                  chrom_size_file,
                                  out_folder,
@@ -27,10 +34,12 @@ convert_maf_to_fasta <- function(maf_folder,
   chroms <- sub(".maf$", "", basename(maf_files))
   chrom_folders <- file.path(out_folder, "fasta", chroms)
   
-  # Find all species in the tree
-  tree <- read.tree(tree_file)
-  species_file <- file.path(out_folder, "species_list.txt")
-  writeLines(tree$tip.label, species_file)
+  # If no species file is provided, find all species in the tree
+  if(is.null(species_file)){
+    tree <- read.tree(tree_file)
+    species_file <- file.path(out_folder, "species_list.txt")
+    writeLines(tree$tip.label, species_file)
+  }
   
   # Process each MAF; output goes to out_folder/fasta/<chr>/
   bpmapply(cxx_convert_maf_to_fasta,       

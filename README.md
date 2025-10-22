@@ -24,7 +24,7 @@ TiMEstamp is an R package for inferring insertion timepoints of mobile elements 
 ## Requirements
 
 - **R** ≥ 4.2  
-- **R packages**: `Rcpp`, `BiocParallel`, `rtracklayer`, `S4Vectors`, `ape`, `IRanges`, `GenomicRanges`, `XVector`, `data.table`, `tidytree`
+- **R packages**: `Rcpp`, `BiocParallel`, `rtracklayer`, `S4Vectors`, `ape`, `IRanges`, `GenomicRanges`, `XVector`, `data.table`, `tidytree``
   (Install from CRAN/Bioconductor as needed.)
 - **C++17 toolchain** (for `std::filesystem`)  
 - This pipeline is designed and tested primarily on **Linux-based systems**
@@ -106,11 +106,14 @@ score  div. del. ins.  sequence    begin     end    (left)    repeat         cla
 Splits the alignment by species, removes columns where the **reference** has `-`, and writes per-species FASTA sequences under `<out_folder>/fasta/<chrom>/`. FASTA headers are set to the **reference chromosome name** (e.g., `>chr22`). Inter-block gaps are filled with `N` for the reference and `-` for non-reference species. Sequences are padded to the reference chromosome length from `chrom.sizes`.
 
 ```r
+# Define a working directory
+work_dir <- "/path/to/TiMEstamp_example"
+
 convert_maf_to_fasta(
   maf_folder        = "/path/to/maf_root",
   tree_file         = "/path/to/tree_file", # (e.g. dataset/464_species.nh)
   chrom_size_file   = "/path/to/hg38.chrom.sizes",
-  out_folder        = "/path/to/TiMEstamp_example/hg38_multiz470way",
+  out_folder        = work_dir,
   threads           = 1L
 )
 ```
@@ -142,8 +145,9 @@ Scans each per-species FASTA for contiguous `-` runs (gaps) and writes:
   (`labels` factor column contains species tags with consistent levels)
 
 ```r
+work_dir <- "/path/to/TiMEstamp_example"
 extract_gaps_from_fasta(
-  folder  = "/path/to/TiMEstamp_example/hg38_multiz470way",
+  folder  = work_dir,
   threads = 1L
 )
 ```
@@ -175,12 +179,14 @@ update_tree(
 
 # 3) Define sister clades from the updated tree
 get_sister(
-  tree_file = "dataset/464_species.nh",
+  tree      = "dataset/464_species.nh",
   folder    = work_dir
 )
 
 # 4) Identify missing loci coverage by clade
-get_missing_coverage_by_clade_fast(folder = work_dir)
+get_missing_coverage_by_clade_fast(folder          = work_dir, 
+				   chrom_size_file = "/path/to/hg38.chrom.sizes"
+)
 
 # 5) Clean clade data and filter loci
 clean_clade_data_fast(folder = work_dir)
