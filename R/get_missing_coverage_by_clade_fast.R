@@ -7,6 +7,7 @@
 #'
 #' @param folder Character scalar. Project folder containing \file{gap/} and
 #'   \file{sister_clades.rds}; outputs are written to \file{fast/}.
+#' @param chrom_size_file Character. UCSC-style chrom.sizes for the reference assembly.
 #' @param reference_file Character or \code{NULL}. Path to an RDS reference
 #'   annotation. If \code{NULL}, defaults to \file{folder/rmsk_range.rds}.
 #'   The object can be a \code{GRanges} or a \code{GRangesList} with a
@@ -44,13 +45,14 @@
 #'
 #' @examples
 #' \dontrun{
-#' get_missing_coverage_by_clade_fast(folder = "proj")
 #' get_missing_coverage_by_clade_fast(folder = "proj",
-#'   reference_file = "proj/rmsk_range.rds", chrom = c("chr1","chr2"))
+#'   chrom_size_file = "proj/chrom.sizes",
+#'   reference_file = "proj/rmsk_range.rds", 
+#'   chrom = c("chr1","chr2"))
 #' }
 #'
 #' @export
-get_missing_coverage_by_clade_fast <- function(folder, reference_file = NULL, chrom = NULL){
+get_missing_coverage_by_clade_fast <- function(folder, chrom_size_file, reference_file = NULL, chrom = NULL){
   clade_file <- file.path(folder, "sister_clades.rds")
   if(!file.exists(clade_file)){
     stop("No clade information found. Please run get_sister() with your phylogenetic tree in Newick (NH) format first.")
@@ -82,6 +84,7 @@ get_missing_coverage_by_clade_fast <- function(folder, reference_file = NULL, ch
 #' locus length to obtain missing coverage fractions.
 #'
 #' @param reference_anno GRanges or GRanges with a \code{$members} GRangesList column.
+#' @param chrom_size_file Character. UCSC-style chrom.sizes for the reference assembly.
 #' @param sister_clades List of character vectors; species per clade.
 #' @param chrom Character scalar; chromosome identifier.
 #' @param folder Project folder with \file{gap/} and \file{fast/}.
@@ -92,13 +95,16 @@ get_missing_coverage_by_clade_fast <- function(folder, reference_file = NULL, ch
 #'
 #' @keywords internal
 #' @noRd
-#' @importFrom GenomeInfoDb seqlevelsInUse seqinfo "seqinfo<-"
+#' @importFrom GenomeInfoDb seqlevelsInUse seqinfo "seqinfo<-" " seqlengths" "seqlengths<-" "seqnames" "seqnames<-"
 #' @importFrom GenomicRanges coverage GRanges ranges
 #' @importFrom IRanges Views viewSums PartitioningByEnd IRanges width
-get_missing_coverage_by_chrom <- function(reference_anno, sister_clades, chrom, folder){
+get_missing_coverage_by_chrom <- function(reference_anno, chrom_size_file, sister_clades, chrom, folder){
   # Calculate missing coverage by clades
   missings <- readRDS(file.path(folder, "gap", paste0(chrom, ".rds")))
-  seqinfo(missings) <- seqinfo(BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38)[chrom] # This has to be removed some day
+  chrom_sizes <- read.delim(chrom_size_file, header = FALSE)
+  chrom_sizes <- setNames(chrom_sizes[,2], chrom_sizes[,1])
+  seqlengths(seqinfo(missings)) <- chrom_sizes[seqnames(seqinfo(missings))]
+  
   included_sp <- unlist(sister_clades, use.names = FALSE)
   missings <- missings[missings$labels %in% included_sp]
   missings$labels <- factor(missings$labels, levels = levels(missings$labels)[levels(missings$labels) %in% included_sp]);gc()
