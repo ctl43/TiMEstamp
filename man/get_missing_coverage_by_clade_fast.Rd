@@ -4,11 +4,18 @@
 \alias{get_missing_coverage_by_clade_fast}
 \title{Fast clade-level missing coverage}
 \usage{
-get_missing_coverage_by_clade_fast(folder, reference_file = NULL, chrom = NULL)
+get_missing_coverage_by_clade_fast(
+  folder,
+  chrom_size_file,
+  reference_file = NULL,
+  chrom = NULL
+)
 }
 \arguments{
 \item{folder}{Character scalar. Project folder containing \file{gap/} and
 \file{sister_clades.rds}; outputs are written to \file{fast/}.}
+
+\item{chrom_size_file}{Character. UCSC-style chrom.sizes for the reference assembly.}
 
 \item{reference_file}{Character or \code{NULL}. Path to an RDS reference
 annotation. If \code{NULL}, defaults to \file{folder/rmsk_range.rds}.
@@ -53,9 +60,10 @@ of missing coverage fractions in [0,1].
 }
 \examples{
 \dontrun{
-get_missing_coverage_by_clade_fast(folder = "proj")
 get_missing_coverage_by_clade_fast(folder = "proj",
-  reference_file = "proj/rmsk_range.rds", chrom = c("chr1","chr2"))
+  chrom_size_file = "proj/chrom.sizes",
+  reference_file = "proj/rmsk_range.rds", 
+  chrom = c("chr1","chr2"))
 }
 
 }
