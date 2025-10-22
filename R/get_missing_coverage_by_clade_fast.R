@@ -73,7 +73,7 @@ get_missing_coverage_by_clade_fast <- function(folder, chrom_size_file, referenc
   }
   
   for(i in chrom){
-    get_missing_coverage_by_chrom(chrom = i, reference_anno = reference_anno, sister_clades = sister_clades, folder = folder)
+    get_missing_coverage_by_chrom(chrom = i, reference_anno = reference_anno, chrom_size_file = chrom_size_file, sister_clades = sister_clades, folder = folder)
   }
 }
 
