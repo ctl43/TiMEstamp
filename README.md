@@ -6,8 +6,8 @@ TiMEstamp is an R package for inferring insertion timepoints of mobile elements 
 - extract unaligned regions (“gaps”, represented by `-`) relative to the reference as BED and `GRanges` objects
 - run downstream workflows to estimate insertion timepoints and explore chimeric insertions
 
-For the latest version, visit the GitHub repository: https://github.com/ctl43/TiMEstamp
-The Zenodo archive is provided only for reproducing results from the publication _Comparative Genomics Reveals LINE-1 Recombination with Diverse RNAs_.
+For the latest version, visit the GitHub repository: https://github.com/ctl43/TiMEstamp.
+The version archived on Zenodo is provided only for reproducing results from the publication _Comparative Genomics Reveals LINE-1 Recombination with Diverse RNAs_.
 
 ---
 
@@ -332,7 +332,7 @@ Because MSAs spanning evolutionarily distant species can be noisy, predicted chi
 
 ## Citing TiMEstamp
 
-If you use **TiMEstamp** in your research, please cite:
+If you use **TiMEstamp** or data derived from **TiMEstamp** in your research, please cite:
 
 Law CT, Burns KH. *Comparative Genomics Reveals LINE-1 Recombination with Diverse RNAs*. **bioRxiv** [Preprint]. 2025 Feb 3:2025.02.02.635956. doi: 10.1101/2025.02.02.635956. PMID: 39975348; PMCID: PMC11838501.
 
