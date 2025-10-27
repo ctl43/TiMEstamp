@@ -19,7 +19,7 @@
 #' @export
 convert_maf_to_fasta <- function(maf_folder,
                                  species_file = NULL, 
-                                 tree_file,
+                                 tree = NULL,
                                  chrom_size_file,
                                  out_folder,
                                  pattern = "^[^.].*\\.maf$",
@@ -34,11 +34,20 @@ convert_maf_to_fasta <- function(maf_folder,
   chroms <- sub(".maf$", "", basename(maf_files))
   chrom_folders <- file.path(out_folder, "fasta", chroms)
   
-  # If no species file is provided, find all species in the tree
-  if(is.null(species_file)){
-    tree <- read.tree(tree_file)
+  if (is.null(tree) && is.null(species_file)) {
+    stop("Either 'tree' or 'species_file' must be provided.\n",
+         "Provide a phylogenetic tree file (Newick format) or a text file containing species names.")
+  }
+  
+  # If no species file is provided, derive one from the tree
+  if (is.null(species_file)) {
+    if (!file.exists(tree)) {
+      stop("The specified tree file does not exist: ", tree)
+    }
+    tree <- read.tree(tree)
     species_file <- file.path(out_folder, "species_list.txt")
     writeLines(tree$tip.label, species_file)
+    message("No species file provided. Generated a species list from the tree and saved to: ", species_file)
   }
   
   # Process each MAF; output goes to out_folder/fasta/<chr>/
