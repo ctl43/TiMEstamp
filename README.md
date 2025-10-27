@@ -111,7 +111,7 @@ work_dir <- "/path/to/TiMEstamp_example"
 
 convert_maf_to_fasta(
   maf_folder        = "/path/to/maf_root",
-  tree_file         = "/path/to/tree_file", # (e.g. dataset/464_species.nh)
+  tree_file         = "/path/to/tree_file", 
   chrom_size_file   = "/path/to/hg38.chrom.sizes",
   out_folder        = work_dir,
   threads           = 1L
@@ -158,7 +158,7 @@ extract_gaps_from_fasta(
 
 This workflow estimates insertion timepoints for all RepeatMasker annotations using an MSA from `multiz470way`. It is optimized for speed and memory efficiency and is recommended when the number of annotations exceeds ~50,000, where per-locus inspection becomes impractical. The trade-off is that it does not evaluate locus-specific availability (unlike Workflow 2); however, for family- or class-level transposable element analyses it captures overall evolutionary trends with sufficient accuracy. See Supplementary Figure 2 in the original paper.
 
-Note: Currently, the logic implemented in `get_timepoint_fast` is tailored for the multiz470way dataset together with `dataset/464_species.nh`. Future updates will improve its flexibility to support additional multiple sequence alignment datasets.
+Note: Currently, the logic implemented in `get_timepoint_fast` is tailored for the multiz470way dataset together with `dataset/464_mammals.nh`. Future updates will improve its flexibility to support additional multiple sequence alignment datasets.
 
 ```r
 # Define a working directory
@@ -170,16 +170,29 @@ prepare_rmsk(
   folder    = work_dir
 )
 
-# 2) (Optional) Prune the phylogenetic tree to selected species
+# 2) Prune the phylogenetic tree to selected species (Or just use dataset/464_mammals.nh)
+library(ape)
+tree <- read.tree("path/to/hg38.470way.nh")
+sister_clades <- get_sister(tree)
+
+# Separating apes and non apes sister clades
+apes <- sister_clades[1:5] 
+non_ape <- sister_clades[6:17]
+
+# Select sister clades in non-apes clades that contain at least 10 genome assemblies
+is_sufficient <- lengths(non_ape) >= 10 # Finding sister clades that have at least 10 genome assemblies
+selected_mammals <- c(apes, non_ape[is_sufficient])
+selected_mammals <- unlist(selected_mammals, use.names = FALSE)
+
 update_tree(
-  tree    = "phylogenetic/hg38.470way.nh",
+  tree    = "path/to/hg38.470way.nh",
   folder  = work_dir,
-  species = selected_species
+  species = selected_mammals
 )
 
 # 3) Define sister clades from the updated tree
 get_sister(
-  tree      = "dataset/464_species.nh",
+  tree      = file.path(work_dir, "updated_tree.nh"),
   folder    = work_dir
 )
 
@@ -253,35 +266,31 @@ work_dir <- "/path/to/TiMEstamp_example"
 
 # 1) Define sister clades from the updated tree
 get_sister(
-  tree = "dataset/464_species.nh",
-  folder    = work_dir
+  tree   = file.path(work_dir, "updated_tree.nh"),
+  folder = work_dir
 )
 
 # 2) Identify portions of LINE-1 missing from the alignment
 get_missing_portion(
-  chrom          = "chr22",
-  reference_file = "dataset/basic_filtered_l1.rds", # Can be found in the datset folder here.
+  reference_file = "dataset/basic_filtered_l1.rds", # Can be found in the dataset folder.
   selected_info  = "fivep_frag",
   folder         = work_dir
 )
 
 # 3) Inspect loci for gap structure and missing data
 inspect_loci(
-  folder = work_dir,
-  chrom  = "chr22"
+  folder = work_dir
 )
 
 # 4) Extract flanking segments (e.g., upstream)
 extract_flanking_segment(
   folder     = work_dir,
-  chrom      = "chr22",
   which_side = "upstream"
 )
 
 # 5) Predict potential chimeric insertions
 predict_chimera(
-  folder = work_dir,
-  chrom  = "chr22"
+  folder = work_dir
 )
 ```
 

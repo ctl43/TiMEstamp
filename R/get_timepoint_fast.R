@@ -1,15 +1,58 @@
-#' Estimates the insertion timepoint
+#' Estimate Insertion Timepoints from Clade-Level Coverage
 #'
-#' This function estimates the insertion timepoint of sequences based on
-#' alignment coverage across sister clades, with an optional adjustment for missing loci.
-
-#' @param folder A character string specifying the directory containing required data files.
-#' @param consider_missing_loci A logical value indicating whether to account for missing loci (default: TRUE).
-#' @param chrom A character string specifying the chromosome of interest.
+#' Estimates the evolutionary insertion timing of reference loci based on
+#' clade-level coverage patterns. The function integrates per-chromosome
+#' reference annotations with cleaned or raw missing-coverage matrices to infer
+#' the earliest clade in which each locus is present.
 #'
-#' @return Saves the computed timepoint in `timepoint` in the specified `folder` directory.
+#' @param folder Character. Path to the project directory containing required
+#'   subdirectories: \file{fast/reference_anno/}, \file{fast/missing_by_clade/}, 
+#'   and optionally \file{fast/cleaned_missing_by_clade/}.
+#' @param chrom Character vector or \code{NULL}. Chromosomes to process. If
+#'   \code{NULL}, all chromosomes are inferred automatically from 
+#'   \file{gap/*.rds}.
+#'
+#' @details
+#' The function reads chromosome-specific reference annotations and corresponding
+#' clade-level coverage matrices. If cleaned coverage data are available under
+#' \file{fast/cleaned_missing_by_clade/}, they are used preferentially; otherwise,
+#' the raw matrices in \file{fast/missing_by_clade/} are used with a warning.
+#'
+#' For each chromosome:
+#' \enumerate{
+#'   \item Load the reference loci from \file{fast/reference_anno/CHROM.rds}.
+#'   \item Load the corresponding clade-level coverage matrix from
+#'         \file{fast/cleaned_missing_by_clade/CHROM.rds} or
+#'         \file{fast/missing_by_clade/CHROM.rds}.
+#'   \item Predict the earliest clade of presence for each locus using
+#'         \code{predict_timepoint()}.
+#'   \item Append the predicted values to the reference object as a
+#'         \code{timepoint} column.
+#' }
+#'
+#' The merged results across chromosomes are saved as
+#' \file{fast/predicted_tp.rds}, which contains a combined object (typically a
+#' \code{GRanges}) with a \code{timepoint} factor column indicating the inferred
+#' insertion clade index.
+#'
+#' @return Invisibly returns \code{NULL}. A combined \code{GRanges}-like object
+#'   with predicted insertion timepoints is saved to
+#'   \file{fast/predicted_tp.rds} within \code{folder}.
+#'
+#' @seealso
+#' \code{\link{get_missing_by_clades_fast}},
+#' \code{\link{clean_clade_data_fast}},
+#' \code{\link{predict_timepoint}}
+#'
+#' @examples
+#' \dontrun{
+#' # Estimate insertion timepoints across all chromosomes
+#' get_timepoint_fast(folder = "results/mammals_project")
+#' }
+#'
 #' @importFrom BiocGenerics match unlist
 #' @export
+
 get_timepoint_fast <- function(folder, chrom = NULL){
   if(is.null(chrom)){
     chrom <- sub(".rds$","",dir(file.path(folder, "gap")))

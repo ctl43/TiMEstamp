@@ -54,14 +54,14 @@
 #'   \code{\link{compute_missing_portion}}
 #'
 #' @export
-extract_flanking_segment <- function(folder, which_side = "upstream", chrom){
+extract_flanking_segment <- function(folder, which_side = "upstream", chrom = NULL){
   clade_file <- file.path(folder, "sister_clades.rds")
   if(!file.exists(clade_file)){
     stop("No clade information found. Please run get_sister() with your phylogenetic tree in Newick (NH) format first.")
   }
   
   if(is.null(chrom)){
-    chrom <- sub(".rds$","",dir(file.path(folder, "gap")))
+    chrom <- sub(".rds$","",dir(file.path(folder, "gap"), pattern = ".rds$"))
   }
   for(i in chrom){
     extract_flanking_segment_by_chrom(CHROM = i, folder = folder, which_side = which_side)

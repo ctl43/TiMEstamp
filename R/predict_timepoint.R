@@ -90,7 +90,7 @@ remove_if_before_na <- function(tp, mat){
 #' @param na_is_confi Logical flag (default: TRUE) indicating whether NA values should be considered confident.
 #' @return A logical vector indicating whether each timepoint is confident.
 #' @export
-timepoint_is_confi <- function(tp, mat, na_is_confi = TRUE){
+timepoint_is_confi <- function(tp, mat, na_is_confi = FALSE){
   list_idx <- cumsum(duplicated(is.na(mat2list(mat)) < -1)) + 1
   val_after_tp <- mat2list(mat)[list_idx == tp + 1L]
 

@@ -2,18 +2,37 @@
 % Please edit documentation in R/update_tree.R
 \name{update_tree}
 \alias{update_tree}
-\title{Update Phylogenetic Tree}
+\title{Update and Save a Phylogenetic Tree}
 \usage{
 update_tree(tree, species, folder)
 }
 \arguments{
-\item{tree}{A \code{treedata} object representing the phylogenetic tree.}
+\item{tree}{Character or \code{phylo}. Input tree, either as a file path to a Newick-format tree
+or as a \code{phylo} object (compatible with the \code{ape} package).}
 
-\item{species}{A vector of species to be kept,}
+\item{species}{Character vector. Names of species (tips) to retain in the tree.}
+
+\item{folder}{Character. Output directory where the updated tree file
+(\code{updated_tree.nh}) will be saved.}
 }
 \value{
-A \code{treedata} object with updated metadata for sister clade groups.
+A \code{phylo} object representing the pruned phylogenetic tree.
 }
 \description{
-Update Phylogenetic Tree
+Reads a phylogenetic tree, prunes it to retain only specified species,
+and writes the updated tree to disk in Newick format.
+}
+\details{
+The function uses \code{\link[ape]{keep.tip}} to remove all taxa not listed in
+\code{species}, preserving the original branching structure among retained taxa.
+The resulting tree is exported to \code{file.path(folder, "updated_tree.nh")}.
+}
+\examples{
+\dontrun{
+library(ape)
+tree <- rtree(10)
+kept_species <- tree$tip.label[1:5]
+pruned_tree <- update_tree(tree, kept_species, "results/")
+}
+
 }

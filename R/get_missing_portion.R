@@ -82,7 +82,7 @@
 #' }
 #'
 #' @export
-get_missing_portion <- function(chrom, reference_file, selected_info = NULL, folder){
+get_missing_portion <- function(chrom = NULL, reference_file, selected_info = NULL, folder){
   if(!(is.null(selected_info)|selected_info %in% c("members", "fivep_frag", "threep_frag"))){
     stop("selected_info can only be either, members, fivep_frag, threep_frag or NULL")
   }
@@ -104,7 +104,7 @@ get_missing_portion <- function(chrom, reference_file, selected_info = NULL, fol
   }
   
   if(is.null(chrom)){
-    chrom <- sub(".rds$","",dir(file.path(folder, "gap")))
+    chrom <- sub(".rds$","", dir(file.path(folder, "gap"), pattern = ".rds$"))
   }
   
   clade_file <- file.path(folder, "sister_clades.rds")

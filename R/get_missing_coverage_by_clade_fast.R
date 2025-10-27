@@ -69,7 +69,7 @@ get_missing_coverage_by_clade_fast <- function(folder, chrom_size_file, referenc
   }
   
   if(is.null(chrom)){
-    chrom <- sub(".rds$","",dir(file.path(folder, "gap")))
+    chrom <- sub(".rds$","", dir(file.path(folder, "gap"), pattern = ".rds$"))
   }
   
   for(i in chrom){

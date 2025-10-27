@@ -1,55 +1,86 @@
-#' Predict chimeric insertions
+#' Predict Chimeric Insertions
 #'
-#' For each selected chromosome, predicts loci with putative chimeric insertions
-#' by comparing the inferred timepoint of the locus to the timepoint
-#' inferred from its flanking segments, and by requiring consistent support from
-#' segment clusters and clade-level reliability filters.
+#' Identifies loci with putative chimeric insertions by comparing the inferred
+#' insertion timepoints of each locus and its flanking segments across sister
+#' clades. Loci are called as chimeric if their flank and locus timepoints
+#' differ while passing reliability, length, and support filters.
 #'
-#' @param folder Character scalar. Project folder containing required inputs and
-#'   where outputs will be written under \file{processed/}.
+#' @param folder Character scalar. Path to the project folder containing all
+#'   required processed inputs and where outputs will be written under
+#'   \file{processed/}.
 #' @param chrom Character vector or \code{NULL}. Chromosomes to process. If
-#'   \code{NULL}, discovered from \file{folder/gap} by stripping the \code{.rds} suffix.
-#' @param which_side Character; \code{"upstream"} or \code{"downstream"} to choose
-#'   the 5' or 3' flank, respectively. Default \code{"upstream"}.
-#' @param min_len Integer (bp). Minimum representative flank length to consider
-#'   as a candidate segment. Default \code{25}.
-#' @param max_len Integer (bp). Maximum representative flank length to consider.
-#'   Default \code{1000}. (Current implementation stops if \code{max_len} is below
-#'   \code{1000}.)
-#' @param min_cov Numeric in \code{[0,1]}. Minimum clade-level coverage agreement
-#'   (converted internally to a missingness cutoff as \code{1 - min_cov}) used by
-#'   \code{predict_timepoint()}. Default \code{0.65}.
-#' @param min_supporting Integer. Minimum total count of supporting segments
-#'   across clusters (after filtering) required to call a locus. Default \code{15L}.
+#'   \code{NULL}, all available chromosomes are inferred automatically from
+#'   filenames in \file{folder/gap/}.
+#' @param which_side Character string. Either \code{"upstream"} (5' flank) or
+#'   \code{"downstream"} (3' flank) to specify which flanking region to evaluate.
+#'   Default: \code{"upstream"}.
+#' @param min_len Integer (bp). Minimum representative flank length to include
+#'   as a candidate segment. Default: \code{25}.
+#' @param max_len Integer (bp). Maximum representative flank length to include.
+#'   Default: \code{1000}. The function aborts if \code{max_len < 1000} or if
+#'   \code{max_len <= min_len}.
+#' @param min_cov Numeric in \code{[0, 1]}. Minimum clade-level coverage agreement
+#'   used internally as a missingness cutoff (\code{1 - min_cov}) for
+#'   \code{predict_timepoint()}. Default: \code{0.65}.
+#' @param min_supporting Integer. Minimum total number of supporting flanking
+#'   segments (after filtering) required for a locus to be called. Default:
+#'   \code{15L}.
 #'
 #' @details
-#' \strong{Inputs expected (created by earlier steps):}
+#' The function orchestrates per-chromosome analysis via
+#' \code{predict_chimera_by_chrom()}, performing the following steps:
+#' \enumerate{
+#'   \item Compute insertion timepoints for loci and flanking segments using
+#'         \code{predict_timepoint()} with a coverage cutoff of \code{1 - min_cov}.
+#'   \item Enforce segment length filters (\code{min_len}, \code{max_len}).
+#'   \item Apply clade-level reliability filters to exclude unreliable loci and segments.
+#'   \item Aggregate results across flanking segment clusters, requiring at least
+#'         \code{min_supporting} total segment support per locus.
+#'   \item Output a subset of reference loci meeting all chimera criteria.
+#' }
+#'
+#' \strong{Expected Inputs (in \file{processed/}):}
 #' \itemize{
-#'   \item \file{processed/cleaned_missing_by_clade/CHROM.rds} — clade-wise missing fractions for loci.
-#'   \item \file{processed/flanking_rep_len/CHROM.rds} — representative flank lengths and clustering metadata.
-#'   \item \file{processed/cleaned_flanking_seg_missing_by_clade/CHROM.rds} — clade-wise missing fractions for flanking segments.
-#'   \item \file{processed/flanking_seg_grp/CHROM.rds} — factor mapping segment rows to parent loci.
-#'   \item \file{processed/flanking_seg_is_cladewise_unreliable/CHROM.rds} — segment-level reliability flags.
-#'   \item \file{processed/is_cladewise_unreliable/CHROM.rds} — locus-level reliability flags.
-#'   \item \file{processed/reference_anno/CHROM.rds} — per-chromosome reference loci.
+#'   \item \file{cleaned_missing_by_clade/CHROM.rds} — clade-level missing fractions for loci.
+#'   \item \file{cleaned_flanking_seg_missing_by_clade/CHROM.rds} — clade-level missing fractions for flanking segments.
+#'   \item \file{flanking_rep_len/CHROM.rds} — representative flank lengths and clustering metadata.
+#'   \item \file{flanking_seg_grp/CHROM.rds} — factor mapping segments to parent loci.
+#'   \item \file{flanking_seg_is_cladewise_unreliable/CHROM.rds} — segment-level reliability flags.
+#'   \item \file{is_cladewise_unreliable/CHROM.rds} — locus-level reliability flags.
+#'   \item \file{reference_anno/CHROM.rds} — per-chromosome reference loci.
 #' }
 #'
 #' \strong{Outputs:}
 #' \itemize{
-#'   \item \file{processed/predicted_chimera_<which_side>/CHROM.rds} — a subset of
-#'         \code{reference_anno} with additional fields for predicted flanking
-#'         coordinates (\code{$flanking_gcoord}) and combined locus range
-#'         (\code{$full_range}) for passed loci.
+#'   \item \file{processed/predicted_chimera_<which_side>/CHROM.rds} — loci passing
+#'         chimera criteria, with additional fields:
+#'         \code{$flanking_gcoord} (flanking genomic coordinates) and
+#'         \code{$full_range} (combined locus range).
+#'   \item \file{processed/predicted_chimera_<which_side>.txt} — combined text
+#'         summary of all chromosomes.
 #' }
 #'
-#' The function validates basic parameter constraints (e.g., \code{min_len > 10},
-#' \code{max_len} not below \code{1000}, and \code{max_len > min_len}).
+#' Parameter constraints are validated internally: \code{min_len > 10},
+#' \code{max_len >= 1000}, and \code{max_len > min_len}.
 #'
 #' @return Invisibly returns \code{NULL}. Called for its side effects (files written).
 #'
-#' @seealso \code{\link{extract_flanking_segment}}, \code{\link{predict_timepoint}}
+#' @seealso
+#' \code{\link{extract_flanking_segment}},
+#' \code{\link{predict_timepoint}},
+#' \code{\link{predict_chimera_by_chrom}}
+#'
+#' @examples
+#' \dontrun{
+#' # Predict upstream (5') chimeric insertions across all chromosomes
+#' predict_chimera(folder = "results/mammals_project", which_side = "upstream")
+#'
+#' # Predict downstream (3') chimeric insertions for chromosome 1 only
+#' predict_chimera(folder = "results/mammals_project", chrom = "chr1", which_side = "downstream")
+#' }
 #'
 #' @export
+
 predict_chimera <- function(folder, chrom = NULL, which_side = "upstream",  min_len = 25, max_len = 1000, min_cov = 0.65, min_supporting = 15L){
   if(is.null(chrom)){
     chrom <- sub(".rds$","",dir(file.path(folder, "gap")))

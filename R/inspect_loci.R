@@ -58,7 +58,7 @@ inspect_loci <- function(folder, selected_info = "fivep_frag", min_gap_len_for_a
   }
   
   if(is.null(chrom)){
-    chrom <- sub(".rds$","",dir(file.path(folder, "gap")))
+    chrom <- sub(".rds$","",dir(file.path(folder, "gap"), pattern = ".rds$"))
   }
   for(i in chrom){
     inspect_loci_by_chrom(CHROM = i, folder = folder, selected_info = selected_info, min_gap_len_for_abs = min_gap_len_for_abs, buffered_size = buffered_size, which_side = which_side)
