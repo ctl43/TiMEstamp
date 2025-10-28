@@ -28,7 +28,6 @@ convert_maf_to_fasta <- function(maf_folder,
   # Getting full path
   maf_folder <- normalizePath(maf_folder, mustWork = TRUE)
   chrom_size_file <- normalizePath(chrom_size_file, mustWork = TRUE)
-  maf_files <- normalizePath(maf_files, mustWork = TRUE)
   chrom_folders <- normalizePath(chrom_folders, mustWork = TRUE)
   folder <- normalizePath(folder, mustWork = TRUE)
   species_file <- normalizePath(species_file, mustWork = TRUE)
