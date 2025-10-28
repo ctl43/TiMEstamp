@@ -79,6 +79,7 @@
 #' @importFrom S4Vectors mcols
 #' @export
 extract_gaps_from_fasta <- function(folder, threads = 1L) {
+  folder <- normalizePath(folder, mustWork = TRUE) # Must be a full path
   stopifnot(dir.exists(folder))
   fasta_folder <- file.path(folder, "fasta")   # produced by convert_maf_to_fasta
   stopifnot(dir.exists(fasta_folder))
@@ -103,7 +104,7 @@ extract_gaps_from_fasta <- function(folder, threads = 1L) {
   fasta_files <- lapply(fa_folders, function(x) {
     files <- dir(x, full.names = TRUE)
     files <- files[grepl("\\.fa(sta)?$", files, ignore.case = TRUE)]
-    sort(files)
+    path.expand(sort(files))
   })
   
   # Process each MAF; output goes to out_folder/<chr>/
