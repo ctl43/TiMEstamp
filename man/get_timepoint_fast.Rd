@@ -7,52 +7,51 @@
 get_timepoint_fast(folder, chrom = NULL)
 }
 \arguments{
-\item{folder}{Character. Path to the project folder containing the required
-subdirectories (\file{fast/reference_anno/}, \file{fast/missing_by_clade/},
-and optionally \file{fast/cleaned_missing_by_clade/}).}
+\item{folder}{Character. Path to the project directory containing required
+subdirectories: \file{fast/reference_anno/}, \file{fast/missing_by_clade/},
+and optionally \file{fast/cleaned_missing_by_clade/}.}
 
 \item{chrom}{Character vector or \code{NULL}. Chromosomes to process. If
-\code{NULL}, inferred automatically from the files under \file{gap/}.}
-
-\item{consider_missing_loci}{Logical. Whether to adjust for loci missing across
-multiple clades (default: \code{TRUE}). Currently not used directly, but kept
-for forward compatibility.}
+\code{NULL}, all chromosomes are inferred automatically from
+\file{gap/*.rds}.}
 }
 \value{
 Invisibly returns \code{NULL}. A combined \code{GRanges}-like object
 with predicted insertion timepoints is saved to
-\file{fast/predicted_tp.rds} within the project folder.
+\file{fast/predicted_tp.rds} within \code{folder}.
 }
 \description{
-Computes approximate insertion timepoints for reference loci based on
-coverage patterns across sister clades, optionally adjusting for missing loci.
-The function processes cleaned clade-level coverage matrices and predicts the
-earliest clade in which each locus appears, providing a proxy for the
-evolutionary timing of insertion events.
+Estimates the evolutionary insertion timing of reference loci based on
+clade-level coverage patterns. The function integrates per-chromosome
+reference annotations with cleaned or raw missing-coverage matrices to infer
+the earliest clade in which each locus is present.
 }
 \details{
 The function reads chromosome-specific reference annotations and corresponding
-clade-level coverage matrices. If cleaned data are available under
+clade-level coverage matrices. If cleaned coverage data are available under
 \file{fast/cleaned_missing_by_clade/}, they are used preferentially; otherwise,
 the raw matrices in \file{fast/missing_by_clade/} are used with a warning.
 
 For each chromosome:
 \enumerate{
-\item Load per-locus reference annotations from \file{fast/reference_anno/CHROM.rds}.
-\item Load cleaned or raw clade-level missing-coverage matrix from
+\item Load the reference loci from \file{fast/reference_anno/CHROM.rds}.
+\item Load the corresponding clade-level coverage matrix from
 \file{fast/cleaned_missing_by_clade/CHROM.rds} or
 \file{fast/missing_by_clade/CHROM.rds}.
-\item Estimate the evolutionary insertion timepoint for each locus using
+\item Predict the earliest clade of presence for each locus using
 \code{predict_timepoint()}.
-\item Combine results across chromosomes and save to disk.
+\item Append the predicted values to the reference object as a
+\code{timepoint} column.
 }
 
-The output file \file{fast/predicted_tp.rds} contains a combined object with
-a \code{timepoint} column indicating the inferred insertion clade index for each locus.
+The merged results across chromosomes are saved as
+\file{fast/predicted_tp.rds}, which contains a combined object (typically a
+\code{GRanges}) with a \code{timepoint} factor column indicating the inferred
+insertion clade index.
 }
 \examples{
 \dontrun{
-# Estimate insertion timing across all available chromosomes
+# Estimate insertion timepoints across all chromosomes
 get_timepoint_fast(folder = "results/mammals_project")
 }
 

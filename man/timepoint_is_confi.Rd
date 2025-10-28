@@ -4,7 +4,7 @@
 \alias{timepoint_is_confi}
 \title{Check Timepoint Confidence}
 \usage{
-timepoint_is_confi(tp, mat, na_is_confi = TRUE)
+timepoint_is_confi(tp, mat, na_is_confi = FALSE)
 }
 \arguments{
 \item{tp}{A numeric vector of predicted timepoints.}

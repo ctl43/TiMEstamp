@@ -27,7 +27,7 @@ The version archived on Zenodo is provided only for reproducing results from the
 ## Requirements
 
 - **R** ≥ 4.2  
-- **R packages**: `Rcpp`, `BiocParallel`, `rtracklayer`, `S4Vectors`, `ape`, `IRanges`, `GenomicRanges`, `XVector`, `data.table`, `tidytree``
+- **R packages**: `Rcpp`, `BiocParallel`, `rtracklayer`, `S4Vectors`, `ape`, `IRanges`, `GenomicRanges`, `XVector`, `data.table`, `tidytree`
   (Install from CRAN/Bioconductor as needed.)
 - **C++17 toolchain** (for `std::filesystem`)  
 - This pipeline is designed and tested primarily on **Linux-based systems**
@@ -114,9 +114,9 @@ work_dir <- "/path/to/TiMEstamp_example"
 
 convert_maf_to_fasta(
   maf_folder        = "/path/to/maf_root",
-  tree_file         = "/path/to/tree_file", 
+  tree              = "/path/to/tree_file", 
   chrom_size_file   = "/path/to/hg38.chrom.sizes",
-  out_folder        = work_dir,
+  folder        = work_dir,
   threads           = 1L
 )
 ```

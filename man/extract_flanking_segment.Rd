@@ -4,7 +4,7 @@
 \alias{extract_flanking_segment}
 \title{Extract representative flanking segments for target loci}
 \usage{
-extract_flanking_segment(folder, which_side = "upstream", chrom)
+extract_flanking_segment(folder, which_side = "upstream", chrom = NULL)
 }
 \arguments{
 \item{folder}{Character scalar. Project folder containing required inputs and

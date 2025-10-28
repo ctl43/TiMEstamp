@@ -2,11 +2,15 @@ Package: TiMEstamp
 Type: Package
 Title: TiMEstamp: Timing Mobile Element Insertions from Multiple Sequence Alignments
 Version: 0.1.0
-Authors@R:
-    c(person(given = "Dicky",
-             family = "Law",
-             role = c("aut", "cre"),
-             email = "find_my_email_in_the_paper@gmail.com"))
+Authors@R: 
+    c(
+        person(
+            given = "Cheuk-Ting",
+            family = "Law",
+            role = c("aut", "cre"),
+            email = "please.refer.to.the.email.in.the.paper@example.com"
+        )
+    )
 Description: Tools to infer insertion timepoints of mobile elements from
     whole-genome multiple sequence alignments (MSAs).
 License: GPL-3

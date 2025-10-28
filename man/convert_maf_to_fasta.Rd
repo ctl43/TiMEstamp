@@ -7,9 +7,9 @@
 convert_maf_to_fasta(
   maf_folder,
   species_file = NULL,
-  tree_file,
+  tree = NULL,
   chrom_size_file,
-  out_folder,
+  folder,
   pattern = "^[^.].*\\\\.maf$",
   buffer_limit_mb = 1L,
   threads = 1L
@@ -20,15 +20,15 @@ convert_maf_to_fasta(
 
 \item{species_file}{Character or \code{NULL}. Path to a plain-text file listing
 species to retain (one per line). If \code{NULL}, species are inferred from
-\code{tree_file} and the list is written to \code{out_folder/species_list.txt}.}
+\code{tree} and the list is written to \code{folder/species_list.txt}.}
 
-\item{tree_file}{Character. Path to a Newick tree file used to curate the
+\item{tree}{Character. Path to a Newick tree file used to curate the
 species list when \code{species_file} is \code{NULL}. Ignored when \code{species_file}
 is provided.}
 
 \item{chrom_size_file}{Character. UCSC-style chrom.sizes for the reference assembly.}
 
-\item{out_folder}{Character. Root output folder. Subfolders named by chromosome will be created.}
+\item{folder}{Character. Root output folder. Subfolders named by chromosome will be created.}
 
 \item{pattern}{Character. Regular expression used to find MAF files.
 Default is \verb{^[^.].*\\\\.maf$}, which matches plain \code{.maf} files and skips hidden files.}

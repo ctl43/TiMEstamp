@@ -10,7 +10,7 @@ clean_clade_data_fast(
   min_gap_len_for_abs = 1000,
   buffered_size = c(100, 250),
   min_available_data = 0.1,
-  min_clade_size = 20,
+  min_clade_size = 10,
   chrom = NULL
 )
 }

@@ -4,7 +4,7 @@
 \alias{get_missing_portion}
 \title{Compute per-species missing fractions for target loci}
 \usage{
-get_missing_portion(chrom, reference_file, selected_info = NULL, folder)
+get_missing_portion(chrom = NULL, reference_file, selected_info = NULL, folder)
 }
 \arguments{
 \item{chrom}{Character vector or \code{NULL}. Chromosome names to process.
