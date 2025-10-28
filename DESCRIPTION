@@ -1,7 +1,7 @@
 Package: TiMEstamp
 Type: Package
 Title: TiMEstamp: Timing Mobile Element Insertions from Multiple Sequence Alignments
-Version: 0.1.0
+Version: 1.0.0
 Authors@R: 
     c(
         person(
