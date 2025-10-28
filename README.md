@@ -116,7 +116,7 @@ convert_maf_to_fasta(
   maf_folder        = "/path/to/maf_root",
   tree              = "/path/to/tree_file", 
   chrom_size_file   = "/path/to/hg38.chrom.sizes",
-  folder        = work_dir,
+  folder            = work_dir,
   threads           = 1L
 )
 ```
